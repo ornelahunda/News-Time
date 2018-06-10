@@ -1,0 +1,19 @@
+{
+  "name": "news-time",
+  "version": "1.0.0",
+  "description": "A scraping project which saves the data on MongoDB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ornelahunda/News-Time.git"
+  },
+  "author": "Ornela Hunda",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ornelahunda/News-Time/issues"
+  },
+  "homepage": "https://github.com/ornelahunda/News-Time#readme"
+}
