@@ -1,0 +1,17 @@
+body {
+    background-image: url("/assets/images/newspaper.jpeg");
+    padding-top: 70px;
+}
+
+.deleteComments {
+	display: inline-block;
+}
+
+.previousCommentss {
+    display: inline-block;
+    width: 90%
+}
+
+#scrape {
+    margin: 8px 0px;
+}
