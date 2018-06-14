@@ -5,23 +5,27 @@ var logger = require("morgan");
 var mongoose = require("mongoose");
 var path = require("path");
 
-// Require all models
-var db = require("./models/");
 
-// Require Scraping tools
+// Requiring Comment and Article models
+
+var db = require("./models");
+// var Comment = require("./models/Comment.js");
+// var Article = require("./models/Article.js");
+
+// Scraping tools
 var request = require("request");
 var cheerio = require("cheerio");
 
 // Set mongoose to leverage built in JavaScript ES6 Promises
 mongoose.Promise = Promise;
 
-//Set the listeningport
+//Define port
 var PORT = process.env.PORT || 3000;
 
 // Initialize Express
 var app = express();
 
-// Use morgan and body parser 
+// Use morgan and body parser with our app
 app.use(logger("dev"));
 app.use(bodyParser.urlencoded({
   extended: false
@@ -41,26 +45,23 @@ app.set("view engine", "handlebars");
 
 // Database configuration with mongoose
 // mongoose.connect("mongodb://heroku_jmv816f9:5j1nd4taq42hi29bfm5hobeujd@ds133192.mlab.com:33192/heroku_jmv816f9");
-
-mongoose.connect("mongodb://localhost/mongoscraper");
-
-// Test connection to MongoDB
+mongoose.connect("mongodb://localhost/newyorktimes");
 var dbConnect = mongoose.connection;
 
-// If ERROR
+// Show any mongoose errors
 dbConnect.on("error", function(error) {
   console.log("Mongoose Error: ", error);
 });
 
-//If connected, log a success message on the console
+// Once logged in to the db through mongoose, log a success message
 dbConnect.once("open", function() {
   console.log("Mongoose connection successful.");
 });
 
 // Routes
+// Html routes:
 
-// HTML Routes
-//GET requests to render Homepage
+//GET requests to render Handlebars pages
 app.get("/", function(req, res) {
   db.Article.find({"saved": false}, function(error, data) {
     var hbsObject = {
@@ -70,9 +71,9 @@ app.get("/", function(req, res) {
     res.render("home", hbsObject);
   });
 });
-//GET requests to render Saved Articles
+
 app.get("/saved", function(req, res) {
-  db.Article.find({"saved": true}).populate("Commentss").exec(function(error, articles) {
+  db.Article.find({"saved": true}).populate("comments").exec(function(error, articles) {
     var hbsObject = {
       article: articles
     };
@@ -80,7 +81,7 @@ app.get("/saved", function(req, res) {
   });
 });
 
-// A GET request to scrape the Nytimes website
+// A GET request to scrape the echojs website
 app.get("/scrape", function(req, res) {
   // First, we grab the body of the html with request
   request("https://www.nytimes.com/", function(error, response, html) {
@@ -99,7 +100,7 @@ app.get("/scrape", function(req, res) {
 
       // Using our Article model, create a new entry
       // This effectively passes the result object to the entry (and the title and link)
-      var entry = new Article(result);
+      var entry = new db.Article(result);
 
       // Now, save that entry to the db
       entry.save(function(err, doc) {
@@ -113,18 +114,17 @@ app.get("/scrape", function(req, res) {
         }
       });
 
-    }); 
-     // Tell the browser that we finished scraping the text
+    });
         res.send("Scrape Complete");
+
   });
+  // Tell the browser that we finished scraping the text
 });
 
-
-
-// GET the articles we scraped from the mongoDB
+// This will get the articles we scraped from the mongoDB
 app.get("/articles", function(req, res) {
   // Grab every doc in the Articles array
-  Article.find({}, function(error, doc) {
+  db.Article.find({}, function(error, doc) {
     // Log any errors
     if (error) {
       console.log(error);
@@ -136,13 +136,12 @@ app.get("/articles", function(req, res) {
   });
 });
 
-
 // Grab an article by it's ObjectId
 app.get("/articles/:id", function(req, res) {
   // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
-  Article.findOne({ "_id": req.params.id })
-  // ..and populate all of the Commentss associated with it
-  .populate("Comments")
+  db.Article.findOne({ "_id": req.params.id })
+  // ..and populate all of the comments associated with it
+  .populate("comment")
   // now, execute our query
   .exec(function(error, doc) {
     // Log any errors
@@ -160,7 +159,7 @@ app.get("/articles/:id", function(req, res) {
 // Save an article
 app.post("/articles/save/:id", function(req, res) {
       // Use the article id to find and update its saved boolean
-      Article.findOneAndUpdate({ "_id": req.params.id }, { "saved": true})
+      db.Article.findOneAndUpdate({ "_id": req.params.id }, { "saved": true})
       // Execute the above query
       .exec(function(err, doc) {
         // Log any errors
@@ -177,7 +176,7 @@ app.post("/articles/save/:id", function(req, res) {
 // Delete an article
 app.post("/articles/delete/:id", function(req, res) {
       // Use the article id to find and update its saved boolean
-      Article.findOneAndUpdate({ "_id": req.params.id }, {"saved": false, "Commentss": []})
+      db.Article.findOneAndUpdate({ "_id": req.params.id }, {"saved": false, "comments": []})
       // Execute the above query
       .exec(function(err, doc) {
         // Log any errors
@@ -191,24 +190,25 @@ app.post("/articles/delete/:id", function(req, res) {
       });
 });
 
-// Create a new Comments
-app.post("/Commentss/save/:id", function(req, res) {
-  // Create a new Comments and pass the req.body to the entry
-  var newComments = new Comments({
+
+// Create a new comment
+app.post("/comments/save/:id", function(req, res) {
+  // Create a new comment and pass the req.body to the entry
+  var newComment = new db.Comments({
     body: req.body.text,
     article: req.params.id
   });
   console.log(req.body)
-  // And save the new Comments the db
-  newComments.save(function(error, Comments) {
+  // And save the new comment the db
+  newComment.save(function(error, comment) {
     // Log any errors
     if (error) {
       console.log(error);
     }
     // Otherwise
     else {
-      // Use the article id to find and update it's Commentss
-      Article.findOneAndUpdate({ "_id": req.params.id }, {$push: { "Commentss": Comments } })
+      // Use the article id to find and update it's comments
+      db.Article.findOneAndUpdate({ "_id": req.params.id }, {$push: { "comments": comment } })
       // Execute the above query
       .exec(function(err) {
         // Log any errors
@@ -217,25 +217,25 @@ app.post("/Commentss/save/:id", function(req, res) {
           res.send(err);
         }
         else {
-          // Or send the Comments to the browser
-          res.send(Comments);
+          // Or send the commemnt to the browser
+          res.send(comment);
         }
       });
     }
   });
 });
 
-// Delete a Comments
-app.delete("/Commentss/delete/:Comments_id/:article_id", function(req, res) {
-  // Use the Comments id to find and delete it
-  Comments.findOneAndRemove({ "_id": req.params.Comments_id }, function(err) {
+// Delete a comment
+app.delete("/comments/delete/:comment_id/:article_id", function(req, res) {
+  // Use the comment id to find and delete it
+  db.Comments.findOneAndRemove({ "_id": req.params.comment_id }, function(err) {
     // Log any errors
     if (err) {
       console.log(err);
       res.send(err);
     }
     else {
-      Article.findOneAndUpdate({ "_id": req.params.article_id }, {$pull: {"Commentss": req.params.Comments_id}})
+      db.Article.findOneAndUpdate({ "_id": req.params.article_id }, {$pull: {"comments": req.params.comment_id}})
        // Execute the above query
         .exec(function(err) {
           // Log any errors
@@ -244,8 +244,8 @@ app.delete("/Commentss/delete/:Comments_id/:article_id", function(req, res) {
             res.send(err);
           }
           else {
-            // Or send the Comments to the browser
-            res.send("Comments Deleted");
+            // Or send the comment to the browser
+            res.send("Comment Deleted");
           }
         });
     }
@@ -254,6 +254,6 @@ app.delete("/Commentss/delete/:Comments_id/:article_id", function(req, res) {
 
 // Listen on port
 app.listen(PORT, function() {
-  console.log("App running on PORT:" + PORT);
+  console.log("App running on port " + PORT);
 });
 

@@ -4,9 +4,9 @@ $("#scrape").on("click", function() {
         method: "GET",
         url: "/scrape",
     }).done(function(data) {
-        console.log(data)
-        window.location = "/"
-    })
+        console.log(data);
+        window.location = "/";
+    });
 });
 
 //Set clicked nav option to active
@@ -22,8 +22,8 @@ $(".save").on("click", function() {
         method: "POST",
         url: "/articles/save/" + thisId
     }).done(function(data) {
-        window.location = "/"
-    })
+        window.location = "/";
+    });
 });
 
 //Handle Delete Article button
@@ -33,43 +33,43 @@ $(".delete").on("click", function() {
         method: "POST",
         url: "/articles/delete/" + thisId
     }).done(function(data) {
-        window.location = "/saved"
-    })
+        window.location = "/saved";
+    });
 });
 
-//Handle Save Comments button
-$(".saveComments").on("click", function() {
+//Handle Save Comment button
+$(".saveComment").on("click", function() {
     var thisId = $(this).attr("data-id");
-    if (!$("#CommentsText" + thisId).val()) {
-        alert("please enter a Comments to save")
+    if (!$("#commentText" + thisId).val()) {
+        alert("Please enter a comment to save");
     }else {
       $.ajax({
             method: "POST",
-            url: "/Commentss/save/" + thisId,
+            url: "/comments/save/" + thisId,
             data: {
-              text: $("#CommentsText" + thisId).val()
+              text: $("#commentText" + thisId).val()
             }
           }).done(function(data) {
               // Log the response
               console.log(data);
-              // Empty the Commentss section
-              $("#CommentsText" + thisId).val("");
-              $(".modalComments").modal("hide");
-              window.location = "/saved"
+              // Empty the comments section
+              $("#commentText" + thisId).val("");
+              $(".modalComment").modal("hide");
+              window.location = "/saved";
           });
     }
 });
 
-//Handle Delete Comments button
-$(".deleteComments").on("click", function() {
-    var CommentsId = $(this).attr("data-Comments-id");
+//Handle Delete Comment button
+$(".deleteComment").on("click", function() {
+    var commentId = $(this).attr("data-comment-id");
     var articleId = $(this).attr("data-article-id");
     $.ajax({
         method: "DELETE",
-        url: "/Commentss/delete/" + CommentsId + "/" + articleId
+        url: "/comments/delete/" + commentId + "/" + articleId
     }).done(function(data) {
-        console.log(data)
-        $(".modalComments").modal("hide");
-        window.location = "/saved"
-    })
+        console.log(data);
+        $(".modalComment").modal("hide");
+        window.location = "/saved";
+    });
 });

@@ -3,11 +3,11 @@ body {
     padding-top: 70px;
 }
 
-.deleteComments {
+.deleteComment {
 	display: inline-block;
 }
 
-.previousCommentss {
+.previousComments {
     display: inline-block;
     width: 90%
 }

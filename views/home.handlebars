@@ -1,4 +1,5 @@
 <!--Homepage-->
+<!--Homepage-->
 <div class="container">
     <div class="col-md-12 jumbotron">
         <div class="text-center">
@@ -7,26 +8,25 @@
 
     </div>
     <div class="col-md-12">
-        {{#if article}}
-            {{#each article}}
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4>{{this.title}}</h4>
-                </div>
-                <div class="panel-body">
-                    <p> {{this.summary}}</p>
-                    <a href={{this.link}} target="_blank">{{this.link}}</a>
-                    <br><br>
-                    <button type="button" class="btn btn-success save" data-id={{this._id}}>Save Article</button>
-                </div>
+        {{#if article}} {{#each article}}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4>{{this.title}}</h4>
             </div>
-            {{/each}}
-        {{else}}
+            <div class="panel-body">
+                <p> {{this.summary}}</p>
+                <a href={{this.link}} target="_blank">{{this.link}}</a>
+                <br>
+                <br>
+                <button type="button" class="btn btn-success save" data-id={{this._id}}>Save Article</button>
+            </div>
+        </div>
+        {{/each}} {{else}}
         <div class="panel panel-default">
             <div class="panel-body">
-            <h4>If you're ready, hit the scrape button above!</h4>
+                <h4> Ready for some news! Hit Scrape Button!</h4>
             </div>
-         </div>
+        </div>
         {{/if}}
     </div>
 </div>
