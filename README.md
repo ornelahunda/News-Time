@@ -11,7 +11,7 @@ A web app that lets users view and leave comments on the latest news. Articles a
 - Comments can be added on saved articles by clicking the "Add a Note" button.
 - Saved articles can be deleted by clicking the "Delete" button.
 
-[Check out the App]()
+[Check out the App]( https://lit-garden-46376.herokuapp.com/)
 
 ## Technologies Used
 - Node.js
