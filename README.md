@@ -2,7 +2,7 @@
 
 A web app that lets users view and leave comments on the latest news. Articles are scraped from the New York Times website.
 
-![Website](https://github.com/ornelahunda/News-Time/master/public/assets/images/news-time.png)
+![Website](https://github.com/ornelahunda/News-Time/blob/master/public/assets/images/news-time.png)
 
 ## How It Works
 - Scrape articles by clicking the "Scrape Articles" button.
@@ -11,7 +11,7 @@ A web app that lets users view and leave comments on the latest news. Articles a
 - Comments can be added on saved articles by clicking the "Add a Note" button.
 - Saved articles can be deleted by clicking the "Delete" button.
 
-[Check out the App](https://sheltered-gorge-91026.herokuapp.com/)
+[Check out the App]()
 
 ## Technologies Used
 - Node.js
